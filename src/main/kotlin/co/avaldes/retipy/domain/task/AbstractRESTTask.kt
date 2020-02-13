@@ -13,6 +13,7 @@ abstract class AbstractRESTTask<R>(
     retipyUri: String,
     private val defaultConfiguration: Map<String, String>
 ) : ITask<R> {
+    
     protected val webClient: WebClient = WebClient.builder()
             .baseUrl(retipyUri)
             .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
@@ -31,8 +32,7 @@ abstract class AbstractRESTTask<R>(
         method: HttpMethod,
         mediaType: MediaType = MediaType.APPLICATION_JSON,
         uri: String = this.uri
-    ): WebClient.RequestBodySpec =
-        webClient.method(method).uri(uri).accept(mediaType)
+    ):WebClient.RequestBodySpec = webClient.method(method).uri(uri).accept(mediaType)   
 
     abstract override fun execute(): R?
 }

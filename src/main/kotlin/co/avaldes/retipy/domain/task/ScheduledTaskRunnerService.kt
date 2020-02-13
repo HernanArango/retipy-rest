@@ -11,6 +11,7 @@ import co.avaldes.retipy.domain.task.tortuosity.TortuosityDensityTask
 import co.avaldes.retipy.domain.task.tortuosity.TortuosityFractalTask
 import co.avaldes.retipy.domain.task.vessels.VesselsClassificationTask
 import co.avaldes.retipy.persistence.evaluation.retinal.RetipyEvaluationStatus
+import co.avaldes.retipy.domain.task.drusen.DrusenClassificationBySizeTask
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
@@ -29,8 +30,9 @@ internal class ScheduledTaskRunnerService(
     private val logger: Logger = LoggerFactory.getLogger(ScheduledTaskRunnerService::class.java)
     private val statusTask: StatusTask = StatusTask(retipyUri)
 
-    @Scheduled(fixedDelay = 120000) // wait 2 minutes to start again
+    @Scheduled(fixedDelay = 30000) // wait 2 minutes to start again
     fun runPendingTasks() {
+        logger.info("-----ENTERING IN THE SCHEDULED-----")
         if (statusTask.execute()) {
             val pendingEvaluations = retipyEvaluationService.getPendingEvaluations()
             // set all pending evaluations as running
@@ -53,7 +55,8 @@ internal class ScheduledTaskRunnerService(
                     retipyEvaluationService.save(it)
                 }
         } else {
-            logger.debug("Retipy processing server '$retipyUri' is currently offline")
+            
+            logger.info("Retipy processing server '$retipyUri' is currently offline")
         }
     }
 
@@ -63,6 +66,7 @@ internal class ScheduledTaskRunnerService(
             RetipyTask.TortuosityFractal -> TortuosityFractalTask(retipyUri, retipyEvaluation)
             RetipyTask.LandmarksClassification -> ClassificationTask(retipyUri, retipyEvaluation)
             RetipyTask.Segmentation -> SegmentationTask(retipyUri, retipyEvaluation = retipyEvaluation)
+            RetipyTask.DrusenClassificationBySize -> DrusenClassificationBySizeTask(retipyUri, retipyEvaluation)
             RetipyTask.VesselsClassification -> VesselsClassificationTask(
                     retipyUri,
                     retipyEvaluation = retipyEvaluation,

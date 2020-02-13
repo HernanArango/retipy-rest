@@ -32,10 +32,12 @@ data class RetipyEvaluation(
     var diagnosticId: Long,
     var name: RetipyTask = RetipyTask.None,
     var image: String = "",
+    var information : String = "",
     var rois: List<Roi> = ArrayList(),
     var status: RetipyEvaluationStatus = RetipyEvaluationStatus.Pending,
     var creationDate: Date = Date(),
     var updateDate: Date = Date()
+    
 ) {
     companion object {
         fun toPersistence(retipyEvaluation: RetipyEvaluation) = RetipyEvaluationBean(
@@ -43,10 +45,12 @@ data class RetipyEvaluation(
             retipyEvaluation.diagnosticId,
             retipyEvaluation.name.name,
             retipyEvaluation.image,
+            retipyEvaluation.information,
             Roi.toPersistence(retipyEvaluation.rois),
             retipyEvaluation.status,
             retipyEvaluation.creationDate,
             retipyEvaluation.updateDate
+
         )
 
         fun fromPersistence(retipyEvaluationBean: RetipyEvaluationBean) = RetipyEvaluation(
@@ -54,10 +58,12 @@ data class RetipyEvaluation(
             retipyEvaluationBean.diagnosticId,
             RetipyTask.valueOf(retipyEvaluationBean.name),
             retipyEvaluationBean.image,
+	    retipyEvaluationBean.information,
             Roi.fromPersistence(retipyEvaluationBean.rois),
             retipyEvaluationBean.status,
             retipyEvaluationBean.creationDate,
             retipyEvaluationBean.updateDate
+            
         )
     }
 }

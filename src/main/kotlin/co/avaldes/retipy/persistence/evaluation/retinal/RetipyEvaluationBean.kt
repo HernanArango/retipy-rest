@@ -38,11 +38,13 @@ data class RetipyEvaluationBean(
     val name: String,
     @Lob
     val image: String,
+    var information : String,
     @Lob
     val rois: String,
     val status: RetipyEvaluationStatus,
     var creationDate: Date = Date(),
     var updateDate: Date = Date()
+    
 ) {
     @PrePersist
     internal fun onCreate() {

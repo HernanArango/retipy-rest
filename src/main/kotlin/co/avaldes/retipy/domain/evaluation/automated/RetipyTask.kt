@@ -25,5 +25,6 @@ enum class RetipyTask {
     VesselsClassification,
     LandmarksClassification,
     Segmentation,
+    DrusenClassificationBySize,
     None,
 }

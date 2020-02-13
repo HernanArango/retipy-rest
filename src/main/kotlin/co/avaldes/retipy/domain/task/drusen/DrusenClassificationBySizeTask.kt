@@ -17,7 +17,7 @@
  * along with retipy.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package co.avaldes.retipy.domain.task.segmentation
+package co.avaldes.retipy.domain.task.drusen
 
 import co.avaldes.retipy.domain.evaluation.automated.RetipyEvaluation
 import co.avaldes.retipy.domain.evaluation.automated.RetipyTask
@@ -28,35 +28,37 @@ import org.slf4j.LoggerFactory
 import org.springframework.http.HttpMethod
 import org.springframework.web.reactive.function.BodyInserters
 
-class SegmentationTask(
+class DrusenClassificationBySizeTask(
     retipyUri: String,
-    configuration: Map<String, String> = mapOf(),
+    //configuration: Map<String, String> = mapOf(),
     private val retipyEvaluation: RetipyEvaluation
 ) : AbstractRESTTask<RetipyEvaluation>(
         RetipyTask.Segmentation.name,
-        "/segmentation",
+        "/drusenclassificationbysize",
         retipyUri,
-        mapOf(PROPERTY_ALGORITHM to "double_segmentation")
+        emptyMap()
     ) {
-    private data class SegmentationTaskRequest(val image: String)
-    private data class SegmentationTaskResponse(val segmentation: String)
+    private data class DrusenClassificationBySizeTaskRequest(val image: String)
+    private data class DrusenClassificationBySizeTaskResponse(val drusen: String, val information: String)
 
-    private val logger: Logger = LoggerFactory.getLogger(SegmentationTask::class.java)
-    private val parameters = addMissingProperties(configuration)
+    private val logger: Logger = LoggerFactory.getLogger(DrusenClassificationBySizeTask::class.java)
+    //private val parameters = addMissingProperties(configuration)
 
     override fun execute(): RetipyEvaluation {
         
         logger.info("Starting task")
         val requestWithBody = getRequest(
-            HttpMethod.POST, uri = this.uri + "/" + parameters[PROPERTY_ALGORITHM])
-            .body(BodyInserters.fromObject(SegmentationTaskRequest(retipyEvaluation.image)))
+            HttpMethod.POST)
+            .body(BodyInserters.fromObject(DrusenClassificationBySizeTaskRequest(retipyEvaluation.image)))
         try {
             val response = requestWithBody.retrieve()
-                .bodyToMono(SegmentationTaskResponse::class.java)
+                .bodyToMono(DrusenClassificationBySizeTaskResponse::class.java)
                 .block()!!
-            retipyEvaluation.image = response.segmentation
+            retipyEvaluation.image = response.drusen
+            retipyEvaluation.information = response.information
             retipyEvaluation.status = RetipyEvaluationStatus.Complete
-            logger.info("Completed")
+            logger.info("Completed xx",response.information)
+            logger.info("Information : {}",response.information);
         } catch (e: Exception) {
             retipyEvaluation.status = RetipyEvaluationStatus.Error
             logger.info("Failed $e")
@@ -65,7 +67,5 @@ class SegmentationTask(
         return retipyEvaluation
     }
 
-    companion object {
-        const val PROPERTY_ALGORITHM = "algorithm"
-    }
+
 }
